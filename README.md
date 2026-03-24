@@ -1,174 +1,220 @@
-# terraria-arpg-marketplace-api
-Uma API para gerenciamento e efetivação de compras de Itens para o tModLoader.
+# Terraria ARPG Marketplace API
 
-📄 Terraria ARPG Marketplace – Architecture & Motivation
-1. Project Motivation
+Backend system for a Diablo-inspired ARPG item marketplace built for a **Terraria mod using tModLoader**.
 
-Este projeto surgiu da necessidade de criar um sistema de marketplace para itens de um mod ARPG inspirado em Diablo desenvolvido para Terraria usando tModLoader.
+This project demonstrates backend architecture concepts such as modular design, concurrency control, API integration, and game-client communication.
 
-ARPGs possuem economias complexas baseadas em:
+The system allows players to browse marketplace listings, purchase items securely, and retrieve their purchases directly inside the game through an in-game mailbox.
 
-raridade de itens
-variações de atributos
-negociação entre jogadores
-sistemas de geração procedural
+---
 
-O objetivo deste projeto é desenvolver um backend escalável e desacoplado que permita:
+# Project Motivation
 
-listar itens disponíveis no marketplace
-permitir compra segura de itens
-registrar transações
-entregar itens adquiridos diretamente dentro do jogo
+ARPG games such as Diablo rely heavily on item economies built around:
 
-O sistema também possui uma interface web simples para interação com o marketplace, enquanto o cliente do jogo atua apenas como consumidor da API.
+- item rarity
+- procedural modifiers
+- player trading
+- item generation systems
 
-Este projeto tem como foco demonstrar conhecimentos em:
+This project explores how such a marketplace system could be implemented using a modern backend stack.
 
-design de sistemas backend
-arquitetura modular
-controle de concorrência
-paginação eficiente
-integração entre sistemas
-🏗 2. High-Level Architecture
+The goal is to design a **clean, modular, and scalable backend** capable of:
 
-O sistema utiliza uma arquitetura monolítica modular baseada no NestJS, organizada por domínios de negócio.
+- listing marketplace items
+- processing purchases safely
+- logging transactions
+- delivering purchased items to the game client
 
-Essa abordagem foi escolhida por oferecer:
+The project also includes a **simple web interface** for interacting with the marketplace, while the Terraria mod acts as an API client responsible only for retrieving purchased items.
 
-simplicidade operacional
-separação clara de responsabilidades
-facilidade de manutenção
-possibilidade de evolução futura
-Principais componentes do sistema:
+---
 
-Backend API
+# High-Level Architecture
 
-NestJS
-responsável pela lógica de negócio
-autenticação
-marketplace
-processamento de ordens
+The system follows a **modular monolith architecture using NestJS**, organized by business domains.
 
-Web Client
+This approach provides:
 
-interface simples para navegação no marketplace
+- clear separation of responsibilities
+- easier maintainability
+- lower operational complexity
+- flexibility for future evolution
 
-Game Client (Terraria Mod)
+The system consists of three main components:
 
-consome a API
-recupera itens comprados através do sistema de mailbox
-📦 3. Core Modules
-Auth Module
+### Backend API
 
-Responsável por:
+NestJS application responsible for business logic, authentication, marketplace management, and order processing.
 
-autenticação de usuários
-emissão de tokens JWT
-controle de acesso às rotas protegidas
-Users Module
+### Web Client
 
-Gerencia:
+A simple web interface used to browse and interact with the marketplace.
 
-dados básicos do usuário
-histórico de compras
-Items Module
+### Game Client (Terraria Mod)
 
-Define os templates de itens disponíveis no jogo.
+A tModLoader mod that consumes the API and retrieves purchased items through an in-game mailbox.
 
-Um template contém:
+---
 
-nome
-tipo
-palavras-chave utilizadas pelo mod para construção do item
-thumbnail
+# Core Modules
 
-Esses templates são usados pelo marketplace para gerar listagens.
+## Auth Module
 
-Marketplace Module
+Handles authentication and authorization.
 
-Gerencia:
+Responsibilities:
 
-itens listados
-status do item (disponível / vendido)
-preço
-vendedor
+- user authentication
+- JWT token generation
+- protected route access
 
-Esse módulo é responsável por disponibilizar os itens para compra.
+---
 
-Orders Module
+## Users Module
 
-Este é o módulo mais crítico do sistema.
+Manages user data and basic account information.
 
-Responsável por:
+Responsibilities:
 
-processar compras
-garantir consistência durante concorrência
-gerar registros de compra
+- user records
+- purchase ownership
 
-O sistema utiliza concorrência otimista para garantir que apenas um usuário consiga comprar um item listado.
+---
 
-Transactions Module
+## Items Module
 
-Registra:
+Defines **item templates** available in the game.
 
-comprador
-vendedor
-preço
-timestamp
-snapshot do item vendido
+Each template includes:
 
-Snapshots garantem que o histórico permaneça consistente mesmo se o item original for alterado posteriormente.
+- name
+- item type
+- keyword array used by the mod to construct the item
+- thumbnail image
 
-Mailbox Module
+These templates are used by the marketplace to generate listings.
 
-Permite que o cliente do jogo recupere itens comprados.
+---
 
-Fluxo:
+## Marketplace Module
 
-jogador abre mailbox no jogo
-o mod faz requisição à API
-a API retorna itens não entregues
-o mod constrói os itens no inventário do jogador
+Responsible for marketplace listings.
 
-Esse sistema permite integração simples entre backend e cliente do jogo.
+Handles:
 
-🔄 4. Purchase Flow
+- item availability
+- listing price
+- seller information
+- listing status (`available` / `sold`)
 
-Fluxo simplificado de compra:
+---
 
-usuário autenticado solicita compra
-backend valida disponibilidade do item
-tentativa de atualização atômica do status
-criação da order
-registro da transaction
-item fica disponível no mailbox do jogador
+## Orders Module
 
-Esse processo garante que dois usuários não possam comprar o mesmo item simultaneamente.
+The **most critical module in the system**.
 
-📄 5. Pagination Strategy
+Responsible for processing item purchases and ensuring consistency when multiple users attempt to buy the same item simultaneously.
 
-A listagem de itens utiliza paginação para evitar retornos de grandes volumes de dados.
+The system uses **optimistic concurrency control** to ensure that only one purchase can succeed.
 
-Inicialmente será utilizado limit/offset pagination, com possibilidade futura de migração para cursor-based pagination para melhor performance em datasets maiores.
+---
 
-☁️ 6. Deployment
+## Transactions Module
 
-O backend poderá ser hospedado em uma plataforma cloud gratuita para fins de demonstração.
+Stores transaction history and sales data.
 
-Possíveis opções:
+Each transaction records:
 
-Railway
-Render
-Fly.io
+- buyer
+- seller
+- price
+- timestamp
+- item snapshot
 
-A API poderá ser disponibilizada com credenciais de teste para facilitar avaliação técnica.
+Item snapshots ensure historical consistency even if the original item template changes later.
 
-🎯 7. Project Goals
+---
 
-Este projeto busca demonstrar conhecimento em:
+## Mailbox Module
 
-arquitetura backend moderna
-design modular
-integração entre sistemas
-controle de concorrência
-construção de APIs escaláveis
+Responsible for delivering purchased items to the game client.
+
+Workflow:
+
+1. Player opens the mailbox item inside Terraria
+2. The mod sends a request to the API
+3. The API returns items that have not yet been delivered
+4. The mod constructs the items in the player's inventory
+
+This approach keeps the game client lightweight and focused only on item retrieval.
+
+---
+
+# Purchase Flow
+
+Simplified purchase process:
+
+1. Authenticated user requests purchase
+2. Backend validates item availability
+3. Atomic update attempt marks item as sold
+4. Order is created
+5. Transaction is recorded
+6. Item becomes available in the player's mailbox
+
+This process prevents multiple users from purchasing the same listing.
+
+---
+
+# Pagination Strategy
+
+Marketplace item listings use pagination to avoid returning large datasets.
+
+The initial implementation uses **limit/offset pagination**, with the possibility of migrating to **cursor-based pagination** for improved performance in larger datasets.
+
+Example:
+
+```GET /marketplace?limit=20&page=2```
+
+Future improvement:
+
+```GET /marketplace?cursor=abc123&limit=20```
+
+
+---
+
+# Deployment
+
+The API may be deployed to a cloud platform for demonstration purposes.
+
+Possible options include:
+
+- Railway
+- Render
+- Fly.io
+
+Test credentials may be provided for recruiters to explore the API.
+
+---
+
+# Project Goals
+
+This project was built to demonstrate knowledge in:
+
+- backend architecture
+- modular system design
+- concurrency control
+- API integration
+- scalable backend development
+
+---
+
+# Future Improvements
+
+Possible future enhancements include:
+
+- cursor-based pagination
+- caching layer (Redis)
+- asynchronous job processing
+- analytics for marketplace activity
+- improved web UI
