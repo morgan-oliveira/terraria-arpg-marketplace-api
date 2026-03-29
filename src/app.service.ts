@@ -9,7 +9,7 @@ export class AppService {
   async getHello() {
     const response = await this.prisma.testDatabase.create({
       data: {
-        id: "Teste"
+        id: "Teste333"
       }
     });
     return response;
