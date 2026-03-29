@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.5.0",
   "engineVersion": "280c870be64f457428992c43c1f6d557fab6e29e",
   "activeProvider": "postgresql",
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Get a free hosted Postgres database in seconds: `npx create-db`\n\ngenerator client {\n  provider     = \"prisma-client\"\n  output       = \"@prisma/client\"\n  moduleFormat = \"cjs\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel TestDatabase {\n  id String @id\n}\n",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Get a free hosted Postgres database in seconds: `npx create-db`\n\ngenerator client {\n  provider     = \"prisma-client\"\n  output       = \"@prisma/client\"\n  moduleFormat = \"cjs\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel TestDatabase {\n  id String @id\n}\n\nmodel User {\n  id      String @id @default(uuid())\n  name    String\n  email   String @unique\n  hash    String @unique\n  phone   String @unique\n  steamId String @unique\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -32,10 +32,10 @@ const config: runtime.GetPrismaClientConfig = {
   }
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"TestDatabase\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"TestDatabase\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"hash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"steamId\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 config.parameterizationSchema = {
-  strings: JSON.parse("[\"where\",\"TestDatabase.findUnique\",\"TestDatabase.findUniqueOrThrow\",\"orderBy\",\"cursor\",\"TestDatabase.findFirst\",\"TestDatabase.findFirstOrThrow\",\"TestDatabase.findMany\",\"data\",\"TestDatabase.createOne\",\"TestDatabase.createMany\",\"TestDatabase.createManyAndReturn\",\"TestDatabase.updateOne\",\"TestDatabase.updateMany\",\"TestDatabase.updateManyAndReturn\",\"create\",\"update\",\"TestDatabase.upsertOne\",\"TestDatabase.deleteOne\",\"TestDatabase.deleteMany\",\"having\",\"_count\",\"_min\",\"_max\",\"TestDatabase.groupBy\",\"TestDatabase.aggregate\",\"AND\",\"OR\",\"NOT\",\"id\",\"equals\",\"in\",\"notIn\",\"lt\",\"lte\",\"gt\",\"gte\",\"contains\",\"startsWith\",\"endsWith\",\"not\",\"set\"]"),
-  graph: "JAkQBBoAAB8AMBsAAAQAEBwAAB8AMB0BAAAAAQEAAAABACABAAAAAQAgBBoAAB8AMBsAAAQAEBwAAB8AMB0BACAAIQADAAAABAAgAwAABQAwBAAAAQAgAwAAAAQAIAMAAAUAMAQAAAEAIAMAAAAEACADAAAFADAEAAABACABHQEAAAABAQgAAAkAIAEdAQAAAAEBCAAACwAwAQgAAAsAMAEdAQAkACECAAAAAQAgCAAADgAgAR0BACQAIQIAAAAEACAIAAAQACACAAAABAAgCAAAEAAgAwAAAAEAIA8AAAkAIBAAAA4AIAEAAAABACABAAAABAAgAxUAACEAIBYAACMAIBcAACIAIAQaAAAaADAbAAAXABAcAAAaADAdAQAbACEDAAAABAAgAwAAFgAwFAAAFwAgAwAAAAQAIAMAAAUAMAQAAAEAIAQaAAAaADAbAAAXABAcAAAaADAdAQAbACEOFQAAHQAgFgAAHgAgFwAAHgAgHgEAAAABHwEAAAAEIAEAAAAEIQEAAAABIgEAAAABIwEAAAABJAEAAAABJQEAAAABJgEAAAABJwEAAAABKAEAHAAhDhUAAB0AIBYAAB4AIBcAAB4AIB4BAAAAAR8BAAAABCABAAAABCEBAAAAASIBAAAAASMBAAAAASQBAAAAASUBAAAAASYBAAAAAScBAAAAASgBABwAIQgeAgAAAAEfAgAAAAQgAgAAAAQhAgAAAAEiAgAAAAEjAgAAAAEkAgAAAAEoAgAdACELHgEAAAABHwEAAAAEIAEAAAAEIQEAAAABIgEAAAABIwEAAAABJAEAAAABJQEAAAABJgEAAAABJwEAAAABKAEAHgAhBBoAAB8AMBsAAAQAEBwAAB8AMB0BACAAIQseAQAAAAEfAQAAAAQgAQAAAAQhAQAAAAEiAQAAAAEjAQAAAAEkAQAAAAElAQAAAAEmAQAAAAEnAQAAAAEoAQAeACEAAAABKQEAAAABAAAAAAMVAAYWAAcXAAgAAAADFQAGFgAHFwAIAQIBAgMBBQYBBgcBBwgBCQoBCgwCCw0DDA8BDRECDhIEERMBEhQBExUCGBgFGRkJ"
+  strings: JSON.parse("[\"where\",\"TestDatabase.findUnique\",\"TestDatabase.findUniqueOrThrow\",\"orderBy\",\"cursor\",\"TestDatabase.findFirst\",\"TestDatabase.findFirstOrThrow\",\"TestDatabase.findMany\",\"data\",\"TestDatabase.createOne\",\"TestDatabase.createMany\",\"TestDatabase.createManyAndReturn\",\"TestDatabase.updateOne\",\"TestDatabase.updateMany\",\"TestDatabase.updateManyAndReturn\",\"create\",\"update\",\"TestDatabase.upsertOne\",\"TestDatabase.deleteOne\",\"TestDatabase.deleteMany\",\"having\",\"_count\",\"_min\",\"_max\",\"TestDatabase.groupBy\",\"TestDatabase.aggregate\",\"User.findUnique\",\"User.findUniqueOrThrow\",\"User.findFirst\",\"User.findFirstOrThrow\",\"User.findMany\",\"User.createOne\",\"User.createMany\",\"User.createManyAndReturn\",\"User.updateOne\",\"User.updateMany\",\"User.updateManyAndReturn\",\"User.upsertOne\",\"User.deleteOne\",\"User.deleteMany\",\"User.groupBy\",\"User.aggregate\",\"AND\",\"OR\",\"NOT\",\"id\",\"name\",\"email\",\"hash\",\"phone\",\"steamId\",\"equals\",\"in\",\"notIn\",\"lt\",\"lte\",\"gt\",\"gte\",\"contains\",\"startsWith\",\"endsWith\",\"not\",\"set\"]"),
+  graph: "QhEgBCoAADsAMCsAAAQAECwAADsAMC0BAAAAAQEAAAABACABAAAAAQAgBCoAADsAMCsAAAQAECwAADsAMC0BADkAIQADAAAABAAgAwAABQAwBAAAAQAgAwAAAAQAIAMAAAUAMAQAAAEAIAMAAAAEACADAAAFADAEAAABACABLQEAAAABAQgAAAkAIAEtAQAAAAEBCAAACwAwAQgAAAsAMAEtAQA_ACECAAAAAQAgCAAADgAgAS0BAD8AIQIAAAAEACAIAAAQACACAAAABAAgCAAAEAAgAwAAAAEAIA8AAAkAIBAAAA4AIAEAAAABACABAAAABAAgAxUAAEAAIBYAAEIAIBcAAEEAIAQqAAA6ADArAAAXABAsAAA6ADAtAQA0ACEDAAAABAAgAwAAFgAwFAAAFwAgAwAAAAQAIAMAAAUAMAQAAAEAIAkqAAA4ADArAAAdABAsAAA4ADAtAQAAAAEuAQA5ACEvAQAAAAEwAQAAAAExAQAAAAEyAQAAAAEBAAAAGgAgAQAAABoAIAkqAAA4ADArAAAdABAsAAA4ADAtAQA5ACEuAQA5ACEvAQA5ACEwAQA5ACExAQA5ACEyAQA5ACEAAwAAAB0AIAMAAB4AMAQAABoAIAMAAAAdACADAAAeADAEAAAaACADAAAAHQAgAwAAHgAwBAAAGgAgBi0BAAAAAS4BAAAAAS8BAAAAATABAAAAATEBAAAAATIBAAAAAQEIAAAiACAGLQEAAAABLgEAAAABLwEAAAABMAEAAAABMQEAAAABMgEAAAABAQgAACQAMAEIAAAkADAGLQEAPwAhLgEAPwAhLwEAPwAhMAEAPwAhMQEAPwAhMgEAPwAhAgAAABoAIAgAACcAIAYtAQA_ACEuAQA_ACEvAQA_ACEwAQA_ACExAQA_ACEyAQA_ACECAAAAHQAgCAAAKQAgAgAAAB0AIAgAACkAIAMAAAAaACAPAAAiACAQAAAnACABAAAAGgAgAQAAAB0AIAMVAAA8ACAWAAA-ACAXAAA9ACAJKgAAMwAwKwAAMAAQLAAAMwAwLQEANAAhLgEANAAhLwEANAAhMAEANAAhMQEANAAhMgEANAAhAwAAAB0AIAMAAC8AMBQAADAAIAMAAAAdACADAAAeADAEAAAaACAJKgAAMwAwKwAAMAAQLAAAMwAwLQEANAAhLgEANAAhLwEANAAhMAEANAAhMQEANAAhMgEANAAhDhUAADYAIBYAADcAIBcAADcAIDMBAAAAATQBAAAABDUBAAAABDYBAAAAATcBAAAAATgBAAAAATkBAAAAAToBAAAAATsBAAAAATwBAAAAAT0BADUAIQ4VAAA2ACAWAAA3ACAXAAA3ACAzAQAAAAE0AQAAAAQ1AQAAAAQ2AQAAAAE3AQAAAAE4AQAAAAE5AQAAAAE6AQAAAAE7AQAAAAE8AQAAAAE9AQA1ACEIMwIAAAABNAIAAAAENQIAAAAENgIAAAABNwIAAAABOAIAAAABOQIAAAABPQIANgAhCzMBAAAAATQBAAAABDUBAAAABDYBAAAAATcBAAAAATgBAAAAATkBAAAAAToBAAAAATsBAAAAATwBAAAAAT0BADcAIQkqAAA4ADArAAAdABAsAAA4ADAtAQA5ACEuAQA5ACEvAQA5ACEwAQA5ACExAQA5ACEyAQA5ACELMwEAAAABNAEAAAAENQEAAAAENgEAAAABNwEAAAABOAEAAAABOQEAAAABOgEAAAABOwEAAAABPAEAAAABPQEANwAhBCoAADoAMCsAABcAECwAADoAMC0BADQAIQQqAAA7ADArAAAEABAsAAA7ADAtAQA5ACEAAAABPgEAAAABAAAAAAAAAAMVAAYWAAcXAAgAAAADFQAGFgAHFwAIAAAAAxUADhYADxcAEAAAAAMVAA4WAA8XABABAgECAwEFBgEGBwEHCAEJCgEKDAILDQMMDwENEQIOEgQREwESFAETFQIYGAUZGQkaGwobHAocHwodIAoeIQofIwogJQIhJgsiKAojKgIkKwwlLAomLQonLgIoMQ0pMhE"
 }
 
 async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Module> {
@@ -197,6 +197,16 @@ export interface PrismaClient<
     * ```
     */
   get testDatabase(): Prisma.TestDatabaseDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.user`: Exposes CRUD operations for the **User** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Users
+    * const users = await prisma.user.findMany()
+    * ```
+    */
+  get user(): Prisma.UserDelegate<ExtArgs, { omit: OmitOpts }>;
 }
 
 export function getPrismaClientClass(): PrismaClientConstructor {
