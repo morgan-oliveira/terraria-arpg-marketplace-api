@@ -22,7 +22,7 @@ export class UserService {
       if (!existsUser) {
         const hash = await this.hashService.hash(createUserDto.password);
         const user = await this.prisma.user.create({
-          data: { name: createUserDto.name, username: createUserDto.username, email: createUserDto. email, phone: createUserDto.phone, hash: hash }
+          data: { name: createUserDto.name, username: createUserDto.username, email: createUserDto.email, phone: createUserDto.phone, hash: hash }
         });
 
 
@@ -33,14 +33,16 @@ export class UserService {
     })
   }
 
+  async findOne(id: string) {
+    return `This action returns a #${id} user`;
+  }
+
   /*
   findAll() {
     return `This action returns all user`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+
 
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
