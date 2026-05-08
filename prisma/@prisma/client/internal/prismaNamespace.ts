@@ -602,6 +602,7 @@ export type TestDatabaseScalarFieldEnum = (typeof TestDatabaseScalarFieldEnum)[k
 export const UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  username: 'username',
   email: 'email',
   hash: 'hash',
   phone: 'phone',

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from './prisma/prisma.service';
+import { PrismaService } from './modules/prisma/prisma.service';
 
 @Injectable()
 export class AppService {
@@ -9,7 +9,7 @@ export class AppService {
   async getHello() {
     const response = await this.prisma.testDatabase.create({
       data: {
-        id: "Teste333"
+        id: "Oi"
       }
     });
     return response;
