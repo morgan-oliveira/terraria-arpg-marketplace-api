@@ -10,4 +10,8 @@
  */
 export type * from './models/TestDatabase.js'
 export type * from './models/User.js'
+export type * from './models/Item.js'
+export type * from './models/Order.js'
+export type * from './models/Cart.js'
+export type * from './models/ApiKey.js'
 export type * from './commonInputTypes.js'
