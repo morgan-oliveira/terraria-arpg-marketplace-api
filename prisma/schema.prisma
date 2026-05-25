@@ -18,11 +18,77 @@ model TestDatabase {
 }
 
 model User {
-  id       String @id @default(uuid())
+  id                        String    @id @unique @default(uuid())
+  name                      String
+  username                  String    @unique
+  email                     String
+  hash                      String    @unique @default("")
+  phone                     String    @unique
+  steamId                   String    @default("")
+  coins                     Int       @default(0)
+
+  items Item[]
+}
+
+model Item {
+  id       String @id @unique @default(uuid())
   name     String
-  username String @unique
-  email    String 
-  hash     String @unique @default("")
-  phone    String @unique
-  steamId  String @unique @default("")
+  price    Int?
+  itemData Json
+  status   Status
+
+  seller   User   @relation(fields: [sellerId], references: [id])
+  sellerId String
+
+  order   Order?  @relation(fields: [orderId], references: [id])
+  orderId String?
+
+  cart   Cart?   @relation(fields: [cartId], references: [id])
+  cartId String?
+}
+
+model Order {
+  id         String   @id @unique @default(uuid())
+  totalPrice Int?     @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt()
+
+  status OrderStatus
+
+  Items Item[]
+}
+
+model Cart {
+  id    String @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt()
+
+  Items Item[]
+}
+
+model ApiKey {
+  id        String   @id @unique @default(uuid())
+  modType   ModType  @unique
+  tokenHash String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+enum Status {
+  AVAILABLE
+  RESERVED
+  PROCESSING
+  CANCELED
+  SOLD
+}
+
+enum OrderStatus {
+  OPEN
+  PROCESSING
+  CANCELED
+  FINISHED
+}
+
+enum ModType {
+  DIABLO
 }
