@@ -12,12 +12,13 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { ItemsModule } from './modules/items/items.module';
 import { MarketplaceModule } from './modules/marketplace/marketplace.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { LoggerModule } from './modules/logger/logger.module';
 
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    AuthModule, UserModule, PrismaModule, OrdersModule, ItemsModule, MarketplaceModule, PaymentsModule
+    LoggerModule, AuthModule, UserModule, PrismaModule, OrdersModule, ItemsModule, MarketplaceModule, PaymentsModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -7,6 +7,15 @@ export class AppService {
   constructor(
     private readonly prisma: PrismaService
   ){}
+
+  getHealth() {
+    return {
+      status: 'ok',
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+    };
+  }
+
   async getHello() {
     try {
       const response = await this.prisma.testDatabase.create({

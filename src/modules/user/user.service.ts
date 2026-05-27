@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -10,6 +10,8 @@ import { ConfigService } from '@nestjs/config';
 import { handlePrismaError } from '../../common/errors/prisma-error-handler';
 import { AddCoinsDto } from './dto/add-coins.dto';
 import { ModAuthService } from '../../common/services/mod-auth.service';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 type ResetPasswordTokenPayload = {
   id: string;
@@ -42,7 +44,8 @@ export class UserService {
     private readonly hashService: HashService,
     private readonly resendService: ResendService,
     private readonly configService: ConfigService,
-    private readonly modAuthService: ModAuthService
+    private readonly modAuthService: ModAuthService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
   ) { }
 
   private generateOtp() {
@@ -80,6 +83,12 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
     try {
+      this.logger.info('User creation requested', {
+        context: UserService.name,
+        username: createUserDto.username,
+        email: createUserDto.email,
+      });
+
       return await this.prisma.$transaction(async () => {
         const existsUser = await this.prisma.user.findFirst({
           where: {
@@ -96,36 +105,69 @@ export class UserService {
             data: { name: createUserDto.name, username: createUserDto.username, email: createUserDto.email, phone: createUserDto.phone, hash: hash }
           });
 
+          this.logger.info('User created successfully', {
+            context: UserService.name,
+            userId: user.id,
+            username: user.username,
+          });
 
           return user;
         } else {
+          this.logger.warn('User creation blocked: user already exists', {
+            context: UserService.name,
+            username: createUserDto.username,
+            email: createUserDto.email,
+          });
           throw new ConflictException('User already exists');
         }
       })
     } catch (error) {
+      this.logger.error('User creation failed', {
+        context: UserService.name,
+        username: createUserDto.username,
+        error: error instanceof Error ? error.message : String(error),
+      });
       handlePrismaError(error, 'Could not create user');
     }
   }
 
   async findOne(id: string) {
     try {
+      this.logger.debug('User lookup requested', {
+        context: UserService.name,
+        userId: id,
+      });
+
       const user = await this.prisma.user.findUnique({
         where: { id },
         select: this.publicUserSelect,
       });
 
       if (!user) {
+        this.logger.warn('User lookup failed: user not found', {
+          context: UserService.name,
+          userId: id,
+        });
         throw new NotFoundException('User not found');
       }
 
       return user;
     } catch (error) {
+      this.logger.error('User lookup failed', {
+        context: UserService.name,
+        userId: id,
+        error: error instanceof Error ? error.message : String(error),
+      });
       handlePrismaError(error, 'Could not find user');
     }
   }
 
   async findAll() {
     try {
+      this.logger.debug('User list requested', {
+        context: UserService.name,
+      });
+
       return await this.prisma.user.findMany({
         select: this.publicUserSelect,
         orderBy: {
@@ -133,12 +175,21 @@ export class UserService {
         },
       });
     } catch (error) {
+      this.logger.error('User list failed', {
+        context: UserService.name,
+        error: error instanceof Error ? error.message : String(error),
+      });
       handlePrismaError(error, 'Could not list users');
     }
   }
 
   async requestResetPasswordOtp({ username }: RequestResetPasswordDto) {
     try {
+      this.logger.info('Reset password OTP requested', {
+        context: UserService.name,
+        username,
+      });
+
       const user = await this.prisma.user.findUnique({
         where: { username },
         select: {
@@ -148,6 +199,10 @@ export class UserService {
       });
 
       if (!user) {
+        this.logger.warn('Reset password OTP failed: user not found', {
+          context: UserService.name,
+          username,
+        });
         throw new NotFoundException('User not found');
       }
 
@@ -164,8 +219,19 @@ export class UserService {
 
       await this.resendService.sendResetPasswordOtp(user.email, otp);
 
+      this.logger.info('Reset password OTP sent', {
+        context: UserService.name,
+        userId: user.id,
+        username,
+      });
+
       return { resetPasswordId, message: 'Reset password OTP sent' };
     } catch (error) {
+      this.logger.error('Reset password OTP request failed', {
+        context: UserService.name,
+        username,
+        error: error instanceof Error ? error.message : String(error),
+      });
       handlePrismaError(error, 'Could not request reset password code');
     }
   }
@@ -175,12 +241,20 @@ export class UserService {
       const resetPasswordRequest = this.parseResetPasswordToken(resetPasswordId);
 
       if (new Date(resetPasswordRequest.expiresAt).getTime() < Date.now()) {
+        this.logger.warn('Reset password failed: code expired', {
+          context: UserService.name,
+          userId: resetPasswordRequest.userId,
+        });
         throw new BadRequestException('Reset password code expired');
       }
 
       const isValidOtp = await this.hashService.validateHash(otp, resetPasswordRequest.otpHash);
 
       if (!isValidOtp) {
+        this.logger.warn('Reset password failed: invalid code', {
+          context: UserService.name,
+          userId: resetPasswordRequest.userId,
+        });
         throw new BadRequestException('Invalid reset password code');
       }
 
@@ -193,8 +267,17 @@ export class UserService {
         },
       });
 
+      this.logger.info('Password reset successfully', {
+        context: UserService.name,
+        userId: resetPasswordRequest.userId,
+      });
+
       return { message: 'Password updated successfully' };
     } catch (error) {
+      this.logger.error('Reset password failed', {
+        context: UserService.name,
+        error: error instanceof Error ? error.message : String(error),
+      });
       handlePrismaError(error, 'Could not reset password');
     }
   }
@@ -207,13 +290,27 @@ export class UserService {
     modToken: string,
   ) {
     try {
+      this.logger.info('Add coins requested', {
+        context: UserService.name,
+        userId: id,
+        authenticatedUserId,
+        amount,
+        modType,
+      });
+
       this.modAuthService.validateModApiKey(modType, modToken);
 
       if (authenticatedUserId !== id) {
+        this.logger.warn('Add coins blocked: bearer user mismatch', {
+          context: UserService.name,
+          userId: id,
+          authenticatedUserId,
+          amount,
+        });
         throw new ForbiddenException('Bearer token does not belong to the requested user');
       }
 
-      return await this.prisma.user.update({
+      const user = await this.prisma.user.update({
         where: { id },
         data: {
           coins: {
@@ -222,7 +319,23 @@ export class UserService {
         },
         select: this.publicUserSelect,
       });
+
+      this.logger.info('Coins added successfully', {
+        context: UserService.name,
+        userId: id,
+        amount,
+        coins: user.coins,
+      });
+
+      return user;
     } catch (error) {
+      this.logger.error('Add coins failed', {
+        context: UserService.name,
+        userId: id,
+        authenticatedUserId,
+        amount,
+        error: error instanceof Error ? error.message : String(error),
+      });
       handlePrismaError(error, 'Could not add coins to user');
     }
   }

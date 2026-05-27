@@ -10,6 +10,7 @@ import { HashService } from '../hash/hash.service';
 import { ResendService } from '../resend/resend.service';
 import { ConfigService } from '@nestjs/config';
 import { ModAuthService } from '../../common/services/mod-auth.service';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
 describe('UserService', () => {
   let service: UserService;
@@ -40,6 +41,15 @@ describe('UserService', () => {
           provide: ModAuthService,
           useValue: {
             validateModApiKey: jest.fn(),
+          },
+        },
+        {
+          provide: WINSTON_MODULE_PROVIDER,
+          useValue: {
+            debug: jest.fn(),
+            error: jest.fn(),
+            info: jest.fn(),
+            warn: jest.fn(),
           },
         },
       ],

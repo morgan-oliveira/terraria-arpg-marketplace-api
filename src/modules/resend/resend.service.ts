@@ -17,7 +17,7 @@ export class ResendService {
     const apiKey = this.configService.getOrThrow<string>('RESEND_APIKEY');
     const from = this.configService.get<string>(
       'RESEND_FROM_EMAIL',
-      'Terraria Marketplace <onboarding@resend.dev>',
+      'DiabloTerraria Marketplace <onboarding@resend.dev>',
     );
 
     const response = await fetch(this.resendApiUrl, {
